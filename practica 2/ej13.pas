@@ -28,6 +28,7 @@
 
 
 
+
 {Una compañía aérea dispone de un archivo maestro donde guarda información sobre suspróximos vuelos. En dicho archivo se tiene almacenado el destino, fecha, hora de salida y la
 cantidad de asientos disponibles. La empresa recibe todos los días dos archivos detalles
 para actualizar el archivo maestro. En dichos archivos se tiene destino, fecha, hora de salida
