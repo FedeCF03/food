@@ -18,6 +18,18 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 {La editorial X, autora de diversos semanarios, posee un archivo maestro con la información
 correspondiente a las diferentes emisiones de los mismos. De cada emisión se registra:
 fecha, código de semanario, nombre del semanario, descripción, precio, total de ejemplares
@@ -70,7 +82,7 @@ Begin
   min.fecha := valoralto;
   For i:=1 To 100 Do
     Begin
-      If ((regs[i].fecha <= min.fecha)And (regs[i].cod_semanario <=min.cod_semanario))Then
+      If ((regs[i].fecha < min.fecha)Or ( regs[i].fecha == min.fecha And (regs[i].cod_semanario <=min.cod_semanario)))Then
         Begin
           min := regs[i];
           pos := i
@@ -81,6 +93,18 @@ Begin
 
 End;
 
+Procedure AbrirDetalles(Var detalles:detalle_file; Var regs:array_reg)
+
+Var i: integer;
+Begin
+  For i:=1 To 100 Do
+    Begin
+      Assign(detalles[i],'detalle'+1+'.dat');
+      Reset(detalles[i]);
+      Read(detalles[i],regs[i]);
+    End;
+
+End;
 
 
 Var 
@@ -88,9 +112,43 @@ Var
   detalles: detalle_file;
   min,aux: reg_detalle;
   regs: array_reg;
-
+  regm: reg_maestro;
+  max,mini: reg_detalle;
 Begin
   Assign(maestro.'maestro.dat');
   reset(maestro);
+  AbrirDetalles(detalle_file,regs);
+  minimo(detalles,regs,min);
+  Read(maestro,regm);
+  max.cod_semanario := 0;
+  mini.cod_semanario := 0;
+  mini.total_vendidos := 999999999;
+  max.total_vendidos := 0;
+  While Not(min.fecha==valoralto) Do
+    Begin
+      aux = min;
+      While !((regm.fecha==aux.fecha) And (regm.cod_semanario==aux.cod_semanario)) 
+        Do
+        read(maestro,regm);
+      While ((regm.fecha==aux.fecha) And (regm.cod_semanario==aux.cod_semanario)) Do
+        Begin
+          regm.total_vendidos := regm.total_vendidos + min.total_vendidos;
+          minimo(detalles,regs,min);
+        End;
+      If (regm.total_vendidos >max.total_vendidos)
+        Then
+        Begin
+          max.total_vendidos := regm.total_vendidos;
+          max.cod_semanario := regm.cod_semanario;
+        End;
+      If (mini.total_vendidos>regm.total_vendidos)
+        Then
+        Begin
+          mini.total_vendidos := regm.total_vendidos;
+          mini.cod_semanario := regm.cod_semanario;
+        End;
+      Seek(maestro,FilePos(maestro)-1);
+      Write(maestro,regm);
+    End;
 
 End.
