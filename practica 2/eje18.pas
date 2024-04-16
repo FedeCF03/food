@@ -186,11 +186,11 @@ Begin
         Then
         Begin
           regm.fallecido := True;
-          minimo_fallecimientos(fallecimientos,regs_falle,minF);
           regm.matricula_medico_fallecimiento: minF.matricula_medico_fallecimiento;
           regm.fecha_hora: minF.fecha_hora;
           regm.lugar: minF.lugar;
-        End;
+          minimo_fallecimientos(fallecimientos,regs_falle,minF);  
+      End;
       regm.nro_partida: min.nro_partida;
       regm.nombre: min.nombre;
       regm.apellido: min.apellido;
