@@ -26,7 +26,7 @@ Type
   End;
   archivo = file Of especie;
 
-
+  text = file Of text;
 Procedure leer_ave(Var r:especie; Var a:archivo)
 Begin
   If Not(Eof(a))Then
@@ -75,17 +75,50 @@ Begin
       leer_ave(a,reg);
     End;
 End;
-Procedure compactado(Var a:archivo; Var b:archivo);
+Procedure compactado(Var a: archivo; Var b: archivo);
 
-Var reg: especie;
+// Variable para almacenar el registro actual que se lee de `a`
+
+Var 
+  reg, ult: especie;
+
+  // Variable para almacenar la posición del registro actual en el archivo `a`
+
+Var 
+  pos: integer;
+
+  // Variable para contar el número de registros borrados
+
+Var 
+  reg_borrados: integer;
+  // Inicio del procedimiento
 Begin
-  leer_ave(a,reg);
-  While (reg.codigo<>valoralto) Do
+  // Lee el primer registro del archivo `a` en la variable `reg`
+  leer_ave(a, reg);
+  // Inicializa el contador de registros borrados a 1
+  reg_borrados := 1;
+  // Recorre todos los registros del archivo `a`
+  While (reg.codigo <> valoralto) Do
     Begin
-      If (reg.codigo>0)Then
-        Write(b,reg);
-      leer_ave(a,reg);
+      // Verifica si el registro actual está marcado como eliminado (código negativo)
+      If (reg.codigo < 0) Then
+        Begin
+          // Guarda la posición actual del archivo en la variable `pos`
+          pos := FilePos - 1;
+          // Busca el último registro en el archivo, teniendo en cuenta los registros borrados
+          Seek(a, FileSize(a) - reg_borrados);
+          Read(a, ult);
+          // Vuelve a la posición del registro actual
+          Seek(a, pos);
+          // Escribe el último registro en la posición del registro actual
+          Write(a, ult);
+          // Incrementa el contador de registros borrados
+          reg_borrados := reg_borrados + 1;
+        End;
+      // Lee el siguiente registro del archivo `a` en la variable `reg`
+      leer_ave
     End;
-
-
+  Seek(a,reg_borrados);
+  Truncate(a);
+  close(a);
 End;
