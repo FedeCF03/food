@@ -68,6 +68,7 @@ Begin
           baja.codigo := baja.codigo*-1;
           Seek(b,FilePos(a)-1);
           Write(b,baja);
+          //escribo en archivo eliminados que lo elimine
           Seek(a,FilePos(a)-1);
           reg.codigo := reg.codigo*-1;
           Write(a,reg);
@@ -75,50 +76,46 @@ Begin
       leer_ave(a,reg);
     End;
 End;
+Procedure buscarUltimoNoBorrado(Var a:archivo,Var reg:especie,Var pos:integer)
+Begin
+  Seek(a,pos);
+  leer_ave(a,reg);
+  While (reg.cod<0) Do
+    Begin
+      leer_ave(a,reg);
+      pos := pos-2;
+      Seek(a,pos);
+    End;
+
+End;
 Procedure compactado(Var a: archivo; Var b: archivo);
 
 // Variable para almacenar el registro actual que se lee de `a`
 
 Var 
   reg, ult: especie;
-
-  // Variable para almacenar la posición del registro actual en el archivo `a`
-
-Var 
-  pos: integer;
-
-  // Variable para contar el número de registros borrados
-
-Var 
-  reg_borrados: integer;
+  reg_borrados,posUlt,pos: integer;
   // Inicio del procedimiento
 Begin
   // Lee el primer registro del archivo `a` en la variable `reg`
   leer_ave(a, reg);
-  // Inicializa el contador de registros borrados a 1
-  reg_borrados := 1;
-  // Recorre todos los registros del archivo `a`
-  While (reg.codigo <> valoralto) Do
+  pos := FilePos();
+  Seek(a,FileSize(a)-1);
+  leer_ave(a,ult);
+  posUlt = FileSize(a-1);
+  buscarUltimoNoBorrado(a,ult,posUlt);
+  While (reg.codigo <> ult.codigo) Do
     Begin
-      // Verifica si el registro actual está marcado como eliminado (código negativo)
       If (reg.codigo < 0) Then
         Begin
-          // Guarda la posición actual del archivo en la variable `pos`
-          pos := FilePos - 1;
-          // Busca el último registro en el archivo, teniendo en cuenta los registros borrados
-          Seek(a, FileSize(a) - reg_borrados);
-          Read(a, ult);
-          // Vuelve a la posición del registro actual
-          Seek(a, pos);
-          // Escribe el último registro en la posición del registro actual
-          Write(a, ult);
-          // Incrementa el contador de registros borrados
-          reg_borrados := reg_borrados + 1;
+          Seek(a,pos);
+          Write(a,ult);
+          buscarUltimoNoBorrado(a,ult,posUlt);
         End;
-      // Lee el siguiente registro del archivo `a` en la variable `reg`
-      leer_ave
+      pos := pos+1;
+      leer_ave(a,reg);
     End;
-  Seek(a,reg_borrados);
+  Seek(a,pos-1);
   Truncate(a);
   close(a);
 End;
