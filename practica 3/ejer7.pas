@@ -83,7 +83,7 @@ Begin
   While (reg.cod<0) Do
     Begin
       leer_ave(a,reg);
-      pos := pos-2;
+      pos := pos-1;
       Seek(a,pos);
     End;
 
@@ -101,7 +101,7 @@ Begin
   leer_ave(a, reg);
   pos := FilePos();
   Seek(a,FileSize(a)-1);
-  leer_ave(a,ult);
+  leer_ave(a,ult)
   posUlt = FileSize(a-1);
   buscarUltimoNoBorrado(a,ult,posUlt);
   While (reg.codigo <> ult.codigo) Do
