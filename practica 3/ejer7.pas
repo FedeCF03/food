@@ -115,7 +115,7 @@ Begin
       pos := pos+1;
       leer_ave(a,reg);
     End;
-  Seek(a,pos-1);
+  Seek(a,pos);
   Truncate(a);
   close(a);
 End;
